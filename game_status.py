@@ -20,14 +20,17 @@ def person_info(image):
     try:
         (p, blood_text, ac) = reader.readtext(blood_field)[0]
         (p, mana_text, ac) = reader.readtext(mana_field)[0]
-        # plt.imshow(mana, cmap='gray')
-        # plt.show()
+
         [blood_now, blood_max] = re.split(r'\W+', blood_text)
         [mana_now, mana_max] = re.split(r'\W+', mana_text)
-        print(blood_now, blood_max)
-        print(mana_now, mana_max)
+
+        return {
+            'blood': blood_now / blood_max,
+            'mana': mana_now / mana_max
+        }
     except:
         print('no mana and blood info')
+        return None
 
 
 def battle_info(image):
@@ -47,4 +50,5 @@ def battle_info(image):
         return rs
     except:
         print('no battle info')
+        return None
 
