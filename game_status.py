@@ -3,20 +3,24 @@
 
 get game status
 """
-from PIL import Image
-import matplotlib.pyplot as plt
+import numpy as np
 import easyocr as ocr
 import re
+import matplotlib.pyplot as plt
+
+reader = ocr.Reader(['en'])
 
 
-def person_info(image):
+def person_info(img):
     """
-    :param image: PIL instance
+    :param img: PIL instance
     :return: dict
     """
+    global reader
+    image = np.array(img)
     blood_field = image[60:90, 130:380]
     mana_field = image[100:122, 350:425]
-    reader = ocr.Reader(['en'])
+
     try:
         (p, blood_text, ac) = reader.readtext(blood_field)[0]
         (p, mana_text, ac) = reader.readtext(mana_field)[0]
@@ -25,8 +29,8 @@ def person_info(image):
         [mana_now, mana_max] = re.split(r'\W+', mana_text)
 
         return {
-            'blood': blood_now / blood_max,
-            'mana': mana_now / mana_max
+            'blood': float(blood_now) / float(blood_max),
+            'mana': float(mana_now) / float(mana_max)
         }
     except:
         print('no mana and blood info')
@@ -37,14 +41,14 @@ def battle_info(image):
     """
     :return: dict info of battle
     """
+    global reader
     battle_field = image[250:650, 400:1150]
-    reader = ocr.Reader(['en'])
     try:
         battle_text = reader.readtext(battle_field, allowlist='0123456789')
         rs = []
         for item in battle_text:
             try:
-                rs.append(int(item[1]))
+                rs.append(float(item[1]))
             except ValueError:
                 print('not recognise number ', item[1])
         return rs
