@@ -6,9 +6,8 @@ get game status
 import numpy as np
 import easyocr as ocr
 import re
-import matplotlib.pyplot as plt
 
-reader = ocr.Reader(['en'])
+reader = ocr.Reader(['en'], gpu=False)
 
 
 def person_info(img):
@@ -37,11 +36,12 @@ def person_info(img):
         return None
 
 
-def battle_info(image):
+def battle_info(img):
     """
     :return: dict info of battle
     """
     global reader
+    image = np.array(img)
     battle_field = image[250:650, 400:1150]
     try:
         battle_text = reader.readtext(battle_field, allowlist='0123456789')
@@ -54,5 +54,5 @@ def battle_info(image):
         return rs
     except:
         print('no battle info')
-        return None
+        return []
 

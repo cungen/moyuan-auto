@@ -82,6 +82,7 @@ def train():
     action_model.compile(optimizer='adam', loss=game_loss)
 
     paused = True
+    r = 0
     while True:
         keys = key_check()
         if 'return' in keys:
@@ -105,6 +106,7 @@ def train():
         # step 1. get screen capture
         game_img = grab_screen(game_position)
         p_info = person_info(game_img)
+        print(p_info)
 
         # step2. check availability
         if p_info is None:
@@ -115,8 +117,12 @@ def train():
         (s_width, s_height) = input_img_size
         img_small = game_img.resize(input_img_size)
         np_img_small = np.array(img_small).reshape((s_width * s_height, 1))
-        move = move_model.predict(x=[np_img_small])
-        action = action_model.predict(x=[np_img_small])
+        if r == 0:
+            move = np.random.randint(5)
+            action = np.random.randint(6)
+        else:
+            move = move_model.predict(x=[[np_img_small]])
+            action = action_model.predict(x=[[np_img_small]])
         move_index = np.argmax(move)
         action_index = np.argmax(action)
         take_action(move_index, action_index)
@@ -125,8 +131,8 @@ def train():
         last_screen_img = grab_screen(game_position)
         last_p_info = person_info(last_screen_img)
 
-        move_model.fit([np_img_small], None)
-        action_model.fit([np_img_small], None)
+        move_model.fit([[np_img_small]], [[np.random.random(5)]])
+        action_model.fit([[np_img_small]], [[np.random.random(5)]])
         old_p_info = last_p_info
 
 
